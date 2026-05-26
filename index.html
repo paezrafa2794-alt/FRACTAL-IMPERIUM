@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRACTAL IMPERIUM</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600;700&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] },
+  startup: { typeset: false }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+:root {
+  --black: #0a0a0a;
+  --white: #f8f5f0;
+  --red: #c01a1a;
+  --red-bright: #e52222;
+  --red-dark: #7a0f0f;
+  --grey-light: #f0ece4;
+  --grey-mid: #d8d0c4;
+  --ink: #1a1410;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--white);color:var(--ink);min-height:100vh;overflow-x:hidden;}
+
+/* HEADER */
+header{background:var(--black);padding:0;position:relative;overflow:hidden;border-bottom:3px solid var(--red);}
+.header-grid{display:grid;grid-template-columns:1fr auto;align-items:stretch;min-height:130px;}
+.header-left{padding:2rem 2.5rem;position:relative;z-index:2;}
+.header-accent{width:4px;height:100%;background:var(--red);position:absolute;left:0;top:0;}
+.header-eyebrow{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--red);margin-bottom:.5rem;}
+.header-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,7vw,5.5rem);color:var(--white);letter-spacing:.04em;line-height:.95;}
+.header-title span{color:var(--red);}
+.header-desc{margin-top:.75rem;font-size:.85rem;color:#a09880;font-style:italic;max-width:560px;line-height:1.6;}
+.header-desc strong{color:#c8b098;font-style:normal;font-weight:400;}
+.header-right{background:var(--red);width:120px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;}
+.header-right::before{content:'∑';font-family:'DM Serif Display',serif;font-size:7rem;color:rgba(255,255,255,.12);position:absolute;font-style:italic;}
+.header-right-inner{font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:.2em;color:rgba(255,255,255,.7);writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);}
+
+/* CONTROLS */
+.controls-bar{background:var(--black);border-bottom:2px solid #1e1a18;padding:.9rem 2rem;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(0,0,0,.4);}
+.ctrl-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:#5a5045;white-space:nowrap;}
+.ctrl-select{font-family:'Barlow',sans-serif;font-size:.8rem;font-weight:500;padding:.45rem .9rem;background:#161210;color:var(--white);border:1px solid #2e2820;border-radius:2px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23c0392b'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .6rem center;padding-right:2rem;}
+.ctrl-select:focus{border-color:var(--red);}
+
+/* difficulty pills */
+.diff-group{display:flex;gap:.3rem;align-items:center;}
+.diff-btn{font-family:'Barlow',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:.35rem .75rem;border:1.5px solid #2e2820;background:transparent;color:#5a5045;cursor:pointer;border-radius:2px;transition:all .15s;white-space:nowrap;}
+.diff-btn:hover{color:var(--white);border-color:#4a4038;}
+.diff-btn.active-easy{background:#166534;color:#fff;border-color:#166534;}
+.diff-btn.active-med{background:#92400e;color:#fff;border-color:#92400e;}
+.diff-btn.active-hard{background:var(--red);color:#fff;border-color:var(--red);}
+.diff-btn.active-all{background:#333;color:#fff;border-color:#555;}
+
+.gen-btn{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:.12em;padding:.5rem 1.8rem;background:var(--red);color:white;border:none;border-radius:2px;cursor:pointer;transition:background .15s,transform .1s;white-space:nowrap;margin-left:auto;}
+.gen-btn:hover{background:var(--red-bright);}
+.gen-btn:active{transform:scale(.97);}
+.sep-v{width:1px;height:24px;background:#2e2820;flex-shrink:0;}
+
+/* CAT PANEL */
+.cat-panel{background:#0e0c0b;border-bottom:1px solid #1e1a18;padding:.8rem 2rem;display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;}
+.cat-btn{font-family:'Barlow',sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:.35rem .85rem;border:1px solid #2e2820;background:transparent;color:#5a5045;cursor:pointer;border-radius:2px;transition:all .15s;white-space:nowrap;}
+.cat-btn:hover{color:var(--white);border-color:#4a4038;}
+.cat-btn.active{background:var(--red);color:white;border-color:var(--red);}
+.select-all-btn{font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .7rem;background:transparent;border:1px dashed #2e2820;color:#4a4038;cursor:pointer;border-radius:2px;transition:all .15s;margin-left:auto;}
+.select-all-btn:hover{color:var(--red);border-color:var(--red);}
+
+/* MAIN */
+main{max-width:960px;margin:0 auto;padding:2rem 1.5rem 5rem;}
+.session-label{display:none;font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.15em;color:#8a7f74;text-transform:uppercase;margin-bottom:1.2rem;padding-bottom:.6rem;border-bottom:1px solid var(--grey-mid);}
+.exercises{display:flex;flex-direction:column;gap:1rem;}
+
+/* CARD */
+.ex-card{background:#fff;border:1px solid var(--grey-mid);border-left:5px solid var(--black);padding:1.3rem 1.6rem 1.1rem;position:relative;transition:box-shadow .2s,transform .15s;animation:cardIn .35s ease both;}
+.ex-card:hover{box-shadow:5px 5px 0 var(--grey-mid);transform:translateX(-2px);}
+@keyframes cardIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+.ex-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;}
+.ex-num{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:#8a7f74;letter-spacing:.1em;}
+.ex-tags{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
+.ex-tag{font-size:.6rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:.18rem .55rem;border-radius:2px;}
+.ex-tag.cat{background:var(--black);color:white;}
+.ex-tag.sub{background:var(--grey-light);color:#4a4038;border:1px solid var(--grey-mid);}
+.ex-tag.diff-easy{background:#dcfce7;color:#166534;border:1px solid #86efac;}
+.ex-tag.diff-med{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;}
+.ex-tag.diff-hard{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
+.ex-question{font-size:.92rem;color:#3a3028;line-height:1.6;margin-bottom:.5rem;}
+.ex-formula-wrap{background:#fafafa;border:1px solid var(--grey-mid);border-radius:2px;padding:.8rem 1.2rem;margin:.6rem 0 .8rem;overflow-x:auto;text-align:center;}
+.toggle-sol{font-family:'Barlow',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:none;border:1px solid var(--grey-mid);color:#6a6054;padding:.3rem .9rem;cursor:pointer;border-radius:2px;transition:all .15s;}
+.toggle-sol:hover{border-color:var(--red);color:var(--red);}
+.solution{display:none;margin-top:.7rem;padding:.9rem 1.1rem;background:#fff8f8;border-left:3px solid var(--red);font-size:.9rem;line-height:1.9;animation:fadeIn .2s ease;}
+.solution.visible{display:block;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.sol-label{font-family:'JetBrains Mono',monospace;font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--red);margin-bottom:.5rem;}
+.sol-hint{margin-top:.5rem;font-size:.78rem;color:#7a5a50;font-style:italic;padding-top:.4rem;border-top:1px dashed #e8d0d0;}
+
+/* no-results */
+.no-results{text-align:center;padding:3rem 2rem;color:#8a7f74;border:2px dashed var(--grey-mid);border-radius:2px;margin-top:1rem;}
+.no-results .big{font-family:'Bebas Neue',sans-serif;font-size:3rem;color:#e0d8cc;display:block;}
+
+/* border accent por cat */
+.bc-arit{border-left-color:#b45309;}
+.bc-alg1{border-left-color:#1d4ed8;}
+.bc-alg2{border-left-color:#7c3aed;}
+.bc-geo{border-left-color:#0f766e;}
+.bc-trig{border-left-color:#0e7490;}
+.bc-precal{border-left-color:#92400e;}
+.bc-comp{border-left-color:#1a5276;}
+.bc-dif{border-left-color:var(--red);}
+.bc-int{border-left-color:#166534;}
+.bc-prob{border-left-color:#6b21a8;}
+.bc-ineq{border-left-color:#0f4c75;}
+
+/* EMPTY */
+.empty{text-align:center;padding:5rem 2rem;color:#8a7f74;}
+.empty-sym{font-family:'Bebas Neue',sans-serif;font-size:7rem;color:#e0d8cc;line-height:1;display:block;letter-spacing:.1em;}
+.empty p{font-size:.88rem;margin-top:.7rem;}
+
+/* PRINT */
+@media print{
+  header,.controls-bar,.cat-panel,.toggle-sol,.gen-btn{display:none!important;}
+  .solution{display:block!important;}
+  body,.ex-card{background:white!important;}
+  .ex-card{break-inside:avoid;box-shadow:none!important;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-grid">
+    <div class="header-left">
+      <div class="header-accent"></div>
+      <div class="header-eyebrow">// Generador Procedural de Matemáticas</div>
+      <h1 class="header-title">FRACTAL<br><span>IMPERIUM</span></h1>
+      <p class="header-desc">
+        <em>«Las matemáticas poseen no sólo la verdad, sino cierta belleza suprema».</em>
+        <strong style="display:block;margin-top:.35rem;font-size:.75rem;letter-spacing:.08em;">— Bertrand Russell</strong>
+      </p>
+    </div>
+    <div class="header-right">
+      <div class="header-right-inner">BACHILLERATO · MATEMÁTICAS</div>
+    </div>
+  </div>
+</header>
+
+<div class="controls-bar">
+  <span class="ctrl-label">Ejercicios:</span>
+  <select class="ctrl-select" id="countSel">
+    <option value="1">1 ejercicio</option>
+    <option value="5">5 ejercicios</option>
+    <option value="10" selected>10 ejercicios</option>
+    <option value="15">15 ejercicios</option>
+    <option value="20">20 ejercicios</option>
+    <option value="25">25 ejercicios</option>
+    <option value="30">30 ejercicios</option>
+  </select>
+  <div class="sep-v"></div>
+  <span class="ctrl-label">Dificultad:</span>
+  <div class="diff-group">
+    <button class="diff-btn active-all" data-diff="all">Todas</button>
+    <button class="diff-btn" data-diff="easy">Básica</button>
+    <button class="diff-btn" data-diff="med">Intermedia</button>
+    <button class="diff-btn" data-diff="hard">Avanzada</button>
+  </div>
+  <button class="gen-btn" id="genBtn">↻ GENERAR SERIE</button>
+</div>
+
+<div class="cat-panel">
+  <button class="cat-btn active" data-cat="arit">Pensamiento Aritmético</button>
+  <button class="cat-btn active" data-cat="alg1">Intro al Álgebra</button>
+  <button class="cat-btn active" data-cat="alg2">Álgebra y Funciones</button>
+  <button class="cat-btn active" data-cat="geo">Geometría</button>
+  <button class="cat-btn active" data-cat="trig">Trigonometría y Analítica</button>
+  <button class="cat-btn active" data-cat="ineq">Desigualdades e Inecuaciones</button>
+  <button class="cat-btn active" data-cat="precal">Pre-Cálculo y Funciones</button>
+  <button class="cat-btn active" data-cat="comp">Complejos y Límites</button>
+  <button class="cat-btn active" data-cat="dif">Cálculo Diferencial</button>
+  <button class="cat-btn active" data-cat="int">Cálculo Integral</button>
+  <button class="cat-btn active" data-cat="prob">Probabilidad</button>
+  <button class="select-all-btn" id="selAllBtn">Todos / Ninguno</button>
+</div>
+
+<main>
+  <div class="session-label" id="sessionLabel"></div>
+  <div class="exercises" id="exList">
+    <div class="empty">
+      <span class="empty-sym">∞</span>
+      <p>Selecciona categorías y pulsa <strong>Generar Serie</strong> para comenzar.</p>
+      <p style="margin-top:.4rem;font-size:.78rem;color:#b0a898">11 categorías · 55+ subcategorías · 3 niveles de dificultad</p>
+    </div>
+  </div>
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  UTILIDADES
+// ══════════════════════════════════════════════════════════════
+const rInt  = (a, b) => Math.floor(Math.random() * (b - a + 1)) + a;
+const rPick = arr => arr[Math.floor(Math.random() * arr.length)];
+const rNZ   = (a, b) => { let v; do { v = rInt(a, b); } while (!v); return v; };
+const gcd   = (a, b) => b === 0 ? Math.abs(a) : gcd(b, a % b);
+const lcm   = (a, b) => Math.abs(a * b) / gcd(a, b);
+const signedTerm = (coef, varStr) => {
+  if (coef === 0) return '';
+  const abs = Math.abs(coef);
+  const s = coef > 0 ? '+' : '-';
+  const c = abs === 1 ? '' : abs;
+  return `${s} ${c}${varStr}`;
+};
+const expStr = n => n === 1 ? '' : `^{${n}}`;
+const coefStr = (n, first=false) => {
+  if (first) { if (n===1) return ''; if (n===-1) return '-'; return String(n); }
+  if (n===1) return '+'; if (n===-1) return '-'; return n>0?`+${n}`:`${n}`;
+};
+const TRIG_LIST = [
+  {f:'\\sin', df:'\\cos'},{f:'\\cos', df:'-\\sin'},
+  {f:'\\tan', df:'\\sec^2'},{f:'\\sec', df:'\\sec\\tan'},
+  {f:'\\csc', df:'-\\csc\\cot'},{f:'\\cot', df:'-\\csc^2'},
+];
+
+// ══════════════════════════════════════════════════════════════
+//  NIVELES DE DIFICULTAD
+//  Cada generador recibe el parámetro `diff` ('easy','med','hard')
+//  y ajusta rangos y tipos de ejercicio en consecuencia.
+// ══════════════════════════════════════════════════════════════
+
+// ── 1. ARITMÉTICA ──────────────────────────────────────────────
+function genArit(diff) {
+  const SUBS = {
+    easy:['Operaciones básicas','Fracciones','Potencias y raíces','MCD y MCM'],
+    med: ['Fracciones','MCD y MCM','Razones y proporciones','Decimales y porcentajes','Potencias y raíces'],
+    hard:['Razones y proporciones','Sucesiones numéricas','Conjuntos numéricos','Decimales y porcentajes'],
+  };
+  const sub = rPick(SUBS[diff]);
+  let expr, deriv, hint, question='Resuelve:';
+
+  if (sub === 'Operaciones básicas') {
+    if (diff==='easy') {
+      const a=rInt(1,20), b=rInt(1,20), op=rPick(['+','-']);
+      expr=`${a} ${op} ${b}`; deriv=`${op==='+'?a+b:a-b}`; hint='Operación directa.';
+    } else {
+      const a=rInt(10,999), b=rInt(10,999), op=rPick(['+','-','\\times']);
+      expr=`${a} ${op} ${b}`; deriv=`${op==='+'?a+b:op==='-'?a-b:a*b}`; hint='Operación aritmética.';
+    }
+  } else if (sub === 'Fracciones') {
+    const small = diff==='easy';
+    const [a,b,c,d]=[rNZ(1,small?5:8),rNZ(2,small?6:9),rNZ(1,small?5:8),rNZ(2,small?6:9)];
+    const type=rInt(1,diff==='hard'?3:2);
+    if(type===1){const num=a*d+c*b,den=b*d,g=gcd(num,den);expr=`\\dfrac{${a}}{${b}}+\\dfrac{${c}}{${d}}`;deriv=`\\dfrac{${num}}{${den}}${g>1?`=\\dfrac{${num/g}}{${den/g}}`:''}`;hint=`MCM(${b},${d})=${lcm(b,d)}.`;}
+    else if(type===2){const num=a*c,den=b*d,g=gcd(num,den);expr=`\\dfrac{${a}}{${b}}\\times\\dfrac{${c}}{${d}}`;deriv=`\\dfrac{${num}}{${den}}${g>1?`=\\dfrac{${num/g}}{${den/g}}`:''}`;hint='Multiplica numeradores y denominadores.';}
+    else{const num=a*d,den=b*c,g=gcd(num,den);expr=`\\dfrac{${a}}{${b}}\\div\\dfrac{${c}}{${d}}`;deriv=`\\dfrac{${num}}{${den}}${g>1?`=\\dfrac{${num/g}}{${den/g}}`:''}`;hint='Multiplicar por el recíproco.';}
+  } else if (sub === 'Potencias y raíces') {
+    const type=rInt(1,diff==='easy'?2:3);
+    if(type===1){const v=rPick(diff==='easy'?[4,9,16,25]:[4,9,16,25,36,49,64,81,100]);expr=`\\sqrt{${v}}`;deriv=`${Math.sqrt(v)}`;hint='Raíz cuadrada exacta.';}
+    else if(type===2){const b=rNZ(diff==='easy'?1:2,diff==='easy'?3:5),n=rInt(2,diff==='easy'?3:5);expr=`(${b})^{${n}}`;deriv=`${Math.pow(b,n)}`;hint='Potenciación directa.';}
+    else{const b=rInt(2,4),m=rInt(2,3),n=rInt(2,3);expr=`${b}^{${m}}\\cdot${b}^{${n}}`;deriv=`${b}^{${m+n}}=${Math.pow(b,m+n)}`;hint='$a^m\\cdot a^n=a^{m+n}$.';}
+  } else if (sub === 'MCD y MCM') {
+    const pairs={easy:[[4,6],[6,9],[8,12],[10,15]],med:[[12,18],[15,20],[24,36]],hard:[[30,42],[36,60],[48,72]]};
+    const [a,b]=rPick(pairs[diff]);
+    question='Calcula MCD y MCM de:';
+    expr=`${a}\\text{ y }${b}`;
+    const g=gcd(a,b),l=lcm(a,b);
+    deriv=`\\text{MCD}=${g},\\quad\\text{MCM}=${l}`;
+    hint='Descomposición en factores primos.';
+  } else if (sub === 'Razones y proporciones') {
+    const a=rNZ(2,diff==='hard'?12:6),b=rNZ(2,diff==='hard'?12:6),c=rNZ(2,diff==='hard'?12:6);
+    const x=(b*c)/a; question='Resuelve la proporción:';
+    expr=`\\dfrac{${a}}{${b}}=\\dfrac{${c}}{x}`;
+    deriv=`x=\\dfrac{${b}\\cdot${c}}{${a}}=${Number.isInteger(x)?x:x.toFixed(2)}`;
+    hint='Producto de extremos = medios.';
+  } else if (sub === 'Sucesiones numéricas') {
+    const type=rInt(1,2);
+    if(type===1){const a=rInt(1,10),d=rNZ(diff==='easy'?1:-3,diff==='easy'?4:7);const seq=[a,a+d,a+2*d,a+3*d,a+4*d];question='Término faltante:';expr=`${seq[0]},\\;${seq[1]},\\;${seq[2]},\\;?,\\;${seq[4]}`;deriv=`d=${d},\\quad a_4=${seq[3]}`;hint='Sucesión aritmética.';}
+    else{const a=rInt(1,4),r=rPick([2,3,-2]);const seq=[a,a*r,a*r*r,a*r*r*r];question='Siguiente término:';expr=`${seq[0]},\\;${seq[1]},\\;${seq[2]},\\;${seq[3]},\\;?`;deriv=`r=${r},\\quad a_5=${a*Math.pow(r,4)}`;hint='Sucesión geométrica.';}
+  } else if (sub === 'Decimales y porcentajes') {
+    const p=rPick(diff==='easy'?[10,25,50]:[10,15,20,25,30,40,50,75]);
+    const base=rPick(diff==='easy'?[100,200,400]:[80,120,150,200,250,400,500,1000]);
+    question=`Calcula el ${p}% de ${base}:`;
+    expr=`${p}\\%\\text{ de }${base}`;
+    deriv=`\\dfrac{${p}}{100}\\times${base}=${p*base/100}`;
+    hint='$\\%=\\frac{p}{100}\\times\\text{base}$.';
+  } else {
+    const nums=[rInt(-5,5),rInt(-5,5),rInt(1,9)];
+    expr=`\\text{Clasifica: }${nums[0]},\\;${nums[1]},\\;\\dfrac{${nums[2]}}{${rNZ(2,7)}},\\;\\sqrt{${rPick([4,9,16,25,2,3,5,7])}}`;
+    deriv='Identifica $\\mathbb{N},\\mathbb{Z},\\mathbb{Q},\\mathbb{R}$ para cada número.';
+    hint='$\\mathbb{N}\\subset\\mathbb{Z}\\subset\\mathbb{Q}\\subset\\mathbb{R}$.';
+  }
+  return {cat:'arit',catLabel:'Aritmética',sub,question,expr,deriv,hint,diff};
+}
+
+// ── 2. INTRO AL ÁLGEBRA ───────────────────────────────────────
+function genAlg1(diff) {
+  const SUBS={
+    easy:['Expresiones algebraicas','Ecuaciones lineales','Productos notables'],
+    med: ['Ecuaciones lineales','Sistemas 2x2','Productos notables','Factorización'],
+    hard:['Sistemas 2x2','Factorización','Ecuaciones lineales'],
+  };
+  const sub=rPick(SUBS[diff]);
+  let expr,deriv,hint,question='Resuelve:';
+
+  if(sub==='Ecuaciones lineales'){
+    const a=rNZ(diff==='easy'?1:diff==='med'?-4:-6,diff==='easy'?4:diff==='med'?4:6);
+    const b=rInt(diff==='easy'?0:-8,diff==='easy'?8:10);
+    const c=rInt(diff==='easy'?0:-8,diff==='easy'?8:10);
+    const sol=(c-b)/a;
+    question='Despeja $x$:';
+    expr=`${a}x${b>=0?'+':''}${b}=${c}`;
+    deriv=`x=\\dfrac{${c-b}}{${a}}=${Number.isInteger(sol)?sol:sol.toFixed(2)}`;
+    hint=`Suma/resta ${Math.abs(b)} a ambos lados, divide entre ${a}.`;
+  } else if(sub==='Sistemas 2x2'){
+    const simple=diff==='med';
+    const a1=rNZ(-3,3),b1=rNZ(-3,3),c1=rInt(simple?-6:-10,simple?6:10);
+    const a2=rNZ(-3,3),b2=rNZ(-3,3),c2=rInt(simple?-6:-10,simple?6:10);
+    const det=a1*b2-a2*b1;
+    question='Resuelve el sistema:';
+    expr=`\\begin{cases}${a1}x${b1>=0?'+':''}${b1}y=${c1}\\\\${a2}x${b2>=0?'+':''}${b2}y=${c2}\\end{cases}`;
+    if(det===0){deriv='\\text{Det}=0.\\text{ Sin solución única.}';hint='Analiza si es inconsistente o dependiente.';}
+    else{const x=(c1*b2-c2*b1)/det,y=(a1*c2-a2*c1)/det;deriv=`x=${Number.isInteger(x)?x:x.toFixed(2)},\\quad y=${Number.isInteger(y)?y:y.toFixed(2)}`;hint='Regla de Cramer o sustitución.';}
+  } else if(sub==='Productos notables'){
+    const a=rNZ(diff==='easy'?1:diff==='med'?-4:-5,diff==='easy'?4:5);
+    const b=rNZ(diff==='easy'?1:diff==='med'?-4:-5,diff==='easy'?4:5);
+    const type=rInt(1,diff==='hard'?4:3);
+    question='Expande:';
+    if(type===1){expr=`(x+${b})^2`;deriv=`x^2${signedTerm(2*b,'x')}+${b*b}`;hint='$(a+b)^2=a^2+2ab+b^2$.';}
+    else if(type===2){const k=rNZ(1,4);expr=`(x+${k})(x-${k})`;deriv=`x^2-${k*k}`;hint='$(a+b)(a-b)=a^2-b^2$.';}
+    else if(type===3){expr=`(x+${a})(x+${b})`;deriv=`x^2${signedTerm(a+b,'x')}+${a*b}`;hint='$(x+a)(x+b)=x^2+(a+b)x+ab$.';}
+    else{const c=rNZ(1,3);expr=`(${c}x+${a})^2`;deriv=`${c*c}x^2${signedTerm(2*c*a,'x')}+${a*a}`;hint='$(ax+b)^2=a^2x^2+2abx+b^2$.';}
+  } else if(sub==='Factorización'){
+    const type=rInt(1,diff==='hard'?3:2);
+    if(type===1){const r1=rNZ(-5,5),r2=rNZ(-5,5),b=-(r1+r2),c=r1*r2;question='Factoriza:';expr=`x^2${signedTerm(b,'x')}+${c}`;deriv=`(x${r1>=0?'+':''}${r1})(x${r2>=0?'+':''}${r2})`;hint=`$r_1+r_2=${-b}$, $r_1\\cdot r_2=${c}$.`;}
+    else if(type===2){const a=rNZ(1,4);question='Factoriza diferencia de cuadrados:';expr=`x^2-${a*a}`;deriv=`(x+${a})(x-${a})`;hint='$a^2-b^2=(a+b)(a-b)$.';}
+    else{const f=rNZ(2,5),a=rNZ(-4,4),b=rNZ(-4,4);question='Factoriza sacando factor común:';expr=`${f*a}x^2${signedTerm(f*b,'x')}`;deriv=`${f}x(${a}x${b>=0?'+':''}${b})`;hint=`MCD de coeficientes es ${f}.`;}
+  } else {
+    const a=rNZ(-3,3),b=rInt(-4,4),c=rNZ(-3,3),xv=rInt(diff==='easy'?0:-3,diff==='easy'?3:3);
+    question=`Evalúa para $x=${xv}$:`;
+    expr=`${a}x^2${signedTerm(b,'x')}${c>=0?'+':''}${c}`;
+    deriv=`${a*(xv*xv)+b*xv+c}`;
+    hint=`Sustituye $x=${xv}$ término a término.`;
+  }
+  return {cat:'alg1',catLabel:'Álgebra I',sub,question,expr,deriv,hint,diff};
+}
+
+// ── 3. ÁLGEBRA Y FUNCIONES ────────────────────────────────────
+function genAlg2(diff) {
+  const SUBS={
+    easy:['Función lineal','Ecuaciones cuadráticas'],
+    med: ['Ecuaciones cuadráticas','Función lineal','Función cuadrática'],
+    hard:['Función cuadrática','Ecuaciones cuadráticas'],
+  };
+  const sub=rPick(SUBS[diff]);
+  let expr,deriv,hint,question='Resuelve:';
+
+  if(sub==='Ecuaciones cuadráticas'){
+    if(diff==='easy'){
+      const r=rNZ(-4,4);
+      question='Resuelve (raíz doble):';
+      expr=`x^2-${2*r}x+${r*r}=0`;
+      deriv=`x=${r}\\;(\\text{raíz doble})`;
+      hint=`$(x-${r})^2=0\\implies x=${r}$.`;
+    } else {
+      const r1=rNZ(-6,6),r2=rNZ(-6,6),b=-(r1+r2),c=r1*r2;
+      question='Resuelve la ecuación cuadrática:';
+      expr=`x^2${signedTerm(b,'x')}+${c}=0`;
+      const disc=b*b-4*c;
+      deriv=`x_1=${r1},\\quad x_2=${r2}`;
+      hint=`Fórmula general, $\\Delta=${disc}$.`;
+    }
+  } else if(sub==='Función lineal'){
+    const m=rNZ(diff==='easy'?1:-3,diff==='easy'?3:4),b=rInt(diff==='easy'?-4:-6,diff==='easy'?4:6);
+    const xv=rInt(-3,3);
+    question=`Pendiente, intercepto y $f(${xv})$ para:`;
+    expr=`f(x)=${m===1?'':m}x${b>=0?'+':''}${b}`;
+    deriv=`m=${m},\\; b=${b},\\; f(${xv})=${m*xv+b}`;
+    hint='$y=mx+b$: $m$ pendiente, $b$ intercepto.';
+  } else {
+    const a=rNZ(diff==='hard'?-3:1,diff==='hard'?-1:3);
+    const h=rInt(diff==='easy'?-2:-4,diff==='easy'?2:4),k=rInt(diff==='easy'?-2:-4,diff==='easy'?2:4);
+    question='Vértice y dirección de apertura:';
+    expr=`f(x)=${a===1?'':a===-1?'-':a}(x${h>=0?'-':'+'}${Math.abs(h)})^2${k>=0?'+':''}${k}`;
+    deriv=`\\text{Vértice }(${h},${k}),\\;\\text{abre }${a>0?'\\uparrow':'\\downarrow'}`;
+    hint='Forma canónica $f(x)=a(x-h)^2+k$.';
+  }
+  return {cat:'alg2',catLabel:'Álgebra y Func.',sub,question,expr,deriv,hint,diff};
+}
+
+// ── 4. GEOMETRÍA (nueva categoría ampliada) ───────────────────
+function genGeo(diff) {
+  const SUBS={
+    easy:['Ángulos básicos','Ángulos entre paralelas','Área de figuras','Perímetro'],
+    med: ['Ángulos entre paralelas','Área de figuras','Perímetro','Figuras geométricas','Semejanza'],
+    hard:['Figuras geométricas','Semejanza','Teorema de Pitágoras','Área de figuras'],
+  };
+  const sub=rPick(SUBS[diff]);
+  let expr,deriv,hint,question='Resuelve:';
+
+  if(sub==='Ángulos básicos'){
+    const type=rInt(1,3);
+    if(type===1){
+      const a=rInt(10,80);
+      question='Halla el ángulo complementario y suplementario de:';
+      expr=`\\alpha=${a}°`;
+      deriv=`\\text{Comp.}=90°-${a}°=${90-a}°,\\quad\\text{Sup.}=180°-${a}°=${180-a}°`;
+      hint='Comp.: suma 90°. Sup.: suma 180°.';
+    } else if(type===2){
+      const a=rInt(20,160);
+      question='Halla los ángulos opuestos por el vértice y adyacentes:';
+      expr=`\\angle A=${a}°`;
+      deriv=`\\text{OPV}=${a}°,\\quad\\text{Adyacente}=${180-a}°`;
+      hint='Ángulos OPV son iguales. Adyacentes suman 180°.';
+    } else {
+      const a=rInt(30,80),b=rInt(30,80),c=180-a-b;
+      question='El tercer ángulo del triángulo:';
+      expr=`\\alpha=${a}°,\\;\\beta=${b}°`;
+      deriv=`\\gamma=180°-${a}°-${b}°=${c}°`;
+      hint='La suma de ángulos interiores de un triángulo es 180°.';
+    }
+
+  } else if(sub==='Ángulos entre paralelas'){
+    // NUEVA SUBCATEGORÍA
+    const transAngle=rInt(25,75);
+    const type=rInt(1,4);
+    question='Dos rectas paralelas cortadas por una transversal:';
+    if(type===1){
+      expr=`\\text{Ángulo formado: }${transAngle}°`;
+      deriv=`\\text{Alterno interno}=${transAngle}°,\\quad\\text{Correspondiente}=${transAngle}°,\\quad\\text{Co-interno}=${180-transAngle}°`;
+      hint='Alternos internos y correspondientes son iguales. Co-internos suman 180°.';
+    } else if(type===2){
+      const known=rInt(40,140);
+      question=`Si el ángulo marcado es ${known}°, halla el ángulo alterno externo:`;
+      expr=`\\angle_1=${known}°\\;(\\text{externo})`;
+      deriv=`\\text{Alterno externo}=${known}°`;
+      hint='Los ángulos alternos externos son iguales cuando las rectas son paralelas.';
+    } else if(type===3){
+      const a=rInt(30,80);
+      question=`Si el ángulo co-interno es ${a}°, halla su par:`;
+      expr=`\\angle_1=${a}°`;
+      deriv=`\\angle_2=180°-${a}°=${180-a}°`;
+      hint='Ángulos co-internos (del mismo lado) son suplementarios: suman 180°.';
+    } else {
+      const a=rInt(20,70);
+      question='Identifica y calcula todos los ángulos:';
+      expr=`\\text{Transversal, }\\theta=${a}°`;
+      deriv=`\\alpha=\\gamma=\\varepsilon=\\eta=${a}°,\\quad\\beta=\\delta=\\zeta=\\theta=${180-a}°`;
+      hint='Con dos paralelas y una transversal se forman 8 ángulos: 4 agudos y 4 obtusos iguales entre sí.';
+    }
+
+  } else if(sub==='Área de figuras'){
+    const shapes=['triángulo','rectángulo','trapecio','círculo','rombo'];
+    const shape=rPick(diff==='easy'?['triángulo','rectángulo']:shapes);
+    if(shape==='triángulo'){
+      const b=rInt(3,diff==='hard'?20:12),h=rInt(3,diff==='hard'?15:10);
+      question='Área del triángulo:';
+      expr=`b=${b}\\text{ cm},\\;h=${h}\\text{ cm}`;
+      deriv=`A=\\dfrac{${b}\\times${h}}{2}=${b*h/2}\\text{ cm}^2`;
+      hint='$A=\\frac{1}{2}bh$.';
+    } else if(shape==='rectángulo'){
+      const b=rInt(3,15),h=rInt(3,12);
+      question='Área del rectángulo:';
+      expr=`b=${b}\\text{ cm},\\;h=${h}\\text{ cm}`;
+      deriv=`A=${b}\\times${h}=${b*h}\\text{ cm}^2`;
+      hint='$A=b\\cdot h$.';
+    } else if(shape==='trapecio'){
+      const b1=rInt(4,12),b2=rInt(3,10),h=rInt(3,10);
+      question='Área del trapecio:';
+      expr=`b_1=${b1},\\;b_2=${b2},\\;h=${h}`;
+      deriv=`A=\\dfrac{(${b1}+${b2})\\cdot${h}}{2}=${(b1+b2)*h/2}\\text{ cm}^2`;
+      hint='$A=\\frac{(b_1+b_2)h}{2}$.';
+    } else if(shape==='círculo'){
+      const r=rInt(2,10);
+      question='Área del círculo:';
+      expr=`r=${r}\\text{ cm}`;
+      deriv=`A=\\pi(${r})^2\\approx${(Math.PI*r*r).toFixed(2)}\\text{ cm}^2`;
+      hint='$A=\\pi r^2$.';
+    } else {
+      const d1=rInt(4,14),d2=rInt(4,14);
+      question='Área del rombo (diagonales):';
+      expr=`d_1=${d1}\\text{ cm},\\;d_2=${d2}\\text{ cm}`;
+      deriv=`A=\\dfrac{${d1}\\times${d2}}{2}=${d1*d2/2}\\text{ cm}^2`;
+      hint='$A=\\frac{d_1\\cdot d_2}{2}$.';
+    }
+
+  } else if(sub==='Perímetro'){
+    const type=rInt(1,3);
+    if(type===1){
+      const r=rInt(2,12);
+      question='Perímetro y área del círculo:';
+      expr=`r=${r}\\text{ cm}`;
+      deriv=`P=2\\pi(${r})\\approx${(2*Math.PI*r).toFixed(2)}\\text{ cm},\\quad A\\approx${(Math.PI*r*r).toFixed(2)}\\text{ cm}^2`;
+      hint='$C=2\\pi r$, $A=\\pi r^2$.';
+    } else if(type===2){
+      const [a,b,c]=[rInt(3,12),rInt(3,12),rInt(3,12)];
+      question='Perímetro del triángulo:';
+      expr=`a=${a},\\;b=${b},\\;c=${c}`;
+      deriv=`P=${a}+${b}+${c}=${a+b+c}\\text{ cm}`;
+      hint='Suma de todos los lados.';
+    } else {
+      const n=rPick([3,4,5,6,8]);
+      const l=rInt(3,10);
+      question=`Perímetro del polígono regular ($n=${n}$, lado=${l}):`;
+      expr=`n=${n},\\;l=${l}`;
+      deriv=`P=${n}\\times${l}=${n*l}\\text{ cm}`;
+      hint='$P=n\\cdot l$.';
+    }
+
+  } else if(sub==='Figuras geométricas'){
+    // NUEVA SUBCATEGORÍA — cuadriláteros y polígonos
+    const type=rInt(1,4);
+    if(type===1){
+      const n=rPick([3,4,5,6,8,10,12]);
+      question=`Suma de ángulos interiores del polígono ($n=${n}$):`;
+      expr=`n=${n}\\text{ lados}`;
+      const suma=180*(n-2);
+      deriv=`S=(${n}-2)\\times180°=${suma}°,\\quad\\text{c/ángulo}=${suma/n}°`;
+      hint='$S=(n-2)\\cdot180°$.';
+    } else if(type===2){
+      const l=rInt(3,10),a=rInt(40,80);
+      question='En un paralelogramo con base y ángulo dado:';
+      expr=`b=${l}\\text{ cm},\\;h=${rInt(2,8)}\\text{ cm},\\;\\alpha=${a}°`;
+      deriv=`A=b\\cdot h=${l*rInt(2,8)}\\text{ cm}^2,\\quad\\beta=${180-a}°`;
+      hint='Ángulos opuestos iguales; consecutivos suplementarios.';
+    } else if(type===3){
+      const l=rInt(3,10);
+      question='Para un cuadrado de lado $l$:';
+      expr=`l=${l}\\text{ cm}`;
+      deriv=`P=${4*l}\\text{ cm},\\quad A=${l*l}\\text{ cm}^2,\\quad d=${l}\\sqrt{2}\\approx${(l*Math.sqrt(2)).toFixed(2)}\\text{ cm}`;
+      hint='Diagonal del cuadrado: $d=l\\sqrt{2}$.';
+    } else {
+      const b=rInt(3,12),h=rInt(2,8);
+      question='Propiedades del rectángulo:';
+      expr=`b=${b}\\text{ cm},\\;h=${h}\\text{ cm}`;
+      const d=Math.sqrt(b*b+h*h);
+      deriv=`P=${2*(b+h)}\\text{ cm},\\;A=${b*h}\\text{ cm}^2,\\;d=\\sqrt{${b}^2+${h}^2}\\approx${d.toFixed(2)}\\text{ cm}`;
+      hint='Diagonal: Teorema de Pitágoras.';
+    }
+
+  } else if(sub==='Teorema de Pitágoras'){
+    const type=rInt(1,3);
+    const pythagorean=[[3,4,5],[5,12,13],[8,15,17],[6,8,10],[9,12,15]];
+    const [a,b,c]=rPick(pythagorean);
+    if(type===1){question='Halla la hipotenusa:';expr=`a=${a}\\text{ cm},\\;b=${b}\\text{ cm}`;deriv=`c=\\sqrt{${a}^2+${b}^2}=\\sqrt{${a*a+b*b}}=${c}\\text{ cm}`;hint='$c^2=a^2+b^2$.';}
+    else if(type===2){question='Halla el cateto:';expr=`a=${a}\\text{ cm},\\;c=${c}\\text{ cm}`;deriv=`b=\\sqrt{${c}^2-${a}^2}=\\sqrt{${c*c-a*a}}=${b}\\text{ cm}`;hint='$b^2=c^2-a^2$.';}
+    else{question='¿Es triángulo rectángulo?';const [x,y,z]=[rPick([3,5,7,9]),rPick([4,8,10,12]),rPick([5,10,13,15])];expr=`a=${x},\\;b=${y},\\;c=${z}`;const rect=x*x+y*y===z*z;deriv=rect?`${x}^2+${y}^2=${x*x+y*y}=${z*z}=c^2\\;\\checkmark\\;\\text{SÍ}`:`${x}^2+${y}^2=${x*x+y*y}\\neq${z*z}\\;\\text{NO}`;hint='Verifica $a^2+b^2=c^2$.';}
+
+  } else { // Semejanza
+    const scale=rPick([2,3,0.5,1.5]);
+    const [a,b,c]=[rInt(3,10),rInt(3,10),rInt(3,10)];
+    question=`Triángulos semejantes con escala $k=${scale}$:`;
+    expr=`a=${a},\\;b=${b},\\;c=${c},\\;k=${scale}`;
+    deriv=`a'=${a*scale},\\;b'=${b*scale},\\;c'=${c*scale}`;
+    hint='Lados proporcionales: $a\'=k\\cdot a$.';
+  }
+  return {cat:'geo',catLabel:'Geometría',sub,question,expr,deriv,hint,diff};
+}
+
+// ── 5. TRIGONOMETRÍA Y GEOMETRÍA ANALÍTICA ────────────────────
+function genTrig(diff) {
+  const SUBS={
+    easy:['Razones trigonométricas','Ángulos especiales','Coordenadas y distancia'],
+    med: ['Razones trigonométricas','Ley de senos','Ley de cosenos','Recta y plano'],
+    hard:['Ley de cosenos','Identidades trigonométricas','Cónicas','Recta y plano'],
+  };
+  const sub=rPick(SUBS[diff]);
+  let expr,deriv,hint,question='Resuelve:';
+
+  if(sub==='Razones trigonométricas'){
+    const angles=[{deg:30,sin:'\\frac{1}{2}',cos:'\\frac{\\sqrt{3}}{2}',tan:'\\frac{1}{\\sqrt{3}}'},{deg:45,sin:'\\frac{\\sqrt{2}}{2}',cos:'\\frac{\\sqrt{2}}{2}',tan:'1'},{deg:60,sin:'\\frac{\\sqrt{3}}{2}',cos:'\\frac{1}{2}',tan:'\\sqrt{3}'}];
+    const ang=rPick(angles);const fn=rPick(['\\sin','\\cos','\\tan']);
+    question='Evalúa exactamente:';
+    expr=`${fn}(${ang.deg}°)`;
+    deriv=fn==='\\sin'?ang.sin:fn==='\\cos'?ang.cos:ang.tan;
+    hint='Tabla de ángulos especiales.';
+  } else if(sub==='Ángulos especiales'){
+    const ang=rPick([0,30,45,60,90,120,135,150,180]);
+    const s=Math.sin(ang*Math.PI/180),c=Math.cos(ang*Math.PI/180);
+    question='Evalúa:';
+    expr=`\\theta=${ang}°`;
+    deriv=`\\sin=${s.toFixed(3)},\\;\\cos=${c.toFixed(3)}`;
+    hint='Ángulos de referencia y cuadrantes.';
+  } else if(sub==='Ley de senos'){
+    const a=rInt(4,12),A=rPick([30,45,60]),B=rPick([30,45,60,90]);
+    question=`$a=${a}$, $A=${A}°$, $B=${B}°$. Halla $b$:`;
+    expr=`\\dfrac{a}{\\sin A}=\\dfrac{b}{\\sin B}`;
+    const b=(a*Math.sin(B*Math.PI/180)/Math.sin(A*Math.PI/180)).toFixed(2);
+    deriv=`b=\\dfrac{${a}\\sin${B}°}{\\sin${A}°}\\approx${b}`;
+    hint='$\\frac{a}{\\sin A}=\\frac{b}{\\sin B}$.';
+  } else if(sub==='Ley de cosenos'){
+    const [a,b]=[rInt(3,10),rInt(3,10)],C=rPick([30,45,60,90,120]);
+    const c=Math.sqrt(a*a+b*b-2*a*b*Math.cos(C*Math.PI/180)).toFixed(2);
+    question=`$a=${a}$, $b=${b}$, $C=${C}°$. Halla $c$:`;
+    expr=`c^2=a^2+b^2-2ab\\cos C`;
+    deriv=`c\\approx${c}`;
+    hint='Generaliza el Teorema de Pitágoras.';
+  } else if(sub==='Identidades trigonométricas'){
+    const ids=[{e:'\\sin^2\\theta+\\cos^2\\theta',r:'1'},{e:'1+\\tan^2\\theta',r:'\\sec^2\\theta'},{e:'\\sin(2\\theta)',r:'2\\sin\\theta\\cos\\theta'},{e:'\\cos(2\\theta)',r:'\\cos^2\\theta-\\sin^2\\theta'}];
+    const id=rPick(ids);question='Simplifica:';expr=id.e;deriv=id.r;hint='Identidad fundamental.';
+  } else if(sub==='Coordenadas y distancia'){
+    const x1=rInt(-5,5),y1=rInt(-5,5),x2=rInt(-5,5),y2=rInt(-5,5);
+    const d=Math.sqrt((x2-x1)**2+(y2-y1)**2);
+    question='Distancia y punto medio:';
+    expr=`P_1(${x1},${y1}),\\;P_2(${x2},${y2})`;
+    deriv=`d\\approx${d.toFixed(2)},\\;M=(${(x1+x2)/2},\\;${(y1+y2)/2})`;
+    hint='$d=\\sqrt{\\Delta x^2+\\Delta y^2}$.';
+  } else if(sub==='Recta y plano'){
+    const m=rNZ(-4,4),x1=rInt(-3,3),y1=rInt(-3,3),b=y1-m*x1;
+    question='Ecuación de la recta:';
+    expr=`m=${m},\\;P(${x1},${y1})`;
+    deriv=`y=${m===1?'':m}x${b>=0?'+':''}${b}`;
+    hint='$y-y_1=m(x-x_1)$.';
+  } else {
+    const h=rInt(-4,4),k=rInt(-4,4),r=rInt(1,6);
+    question='Ecuación de la circunferencia:';
+    expr=`C(${h},${k}),\\;r=${r}`;
+    deriv=`(x${h>=0?'-':'+'}${Math.abs(h)})^2+(y${k>=0?'-':'+'}${Math.abs(k)})^2=${r*r}`;
+    hint='$(x-h)^2+(y-k)^2=r^2$.';
+  }
+  return {cat:'trig',catLabel:'Trig. y Analítica',sub,question,expr,deriv,hint,diff};
+}
+
+// ── 6. DESIGUALDADES E INECUACIONES (nueva categoría) ─────────
+function genIneq(diff) {
+  const SUBS={
+    easy:['Desigualdad lineal','Intervalo numérico'],
+    med: ['Desigualdad lineal','Inecuación cuadrática','Sistema de desigualdades'],
+    hard:['Inecuación cuadrática','Sistema de desigualdades','Inecuación con valor absoluto'],
+  };
+  const sub=rPick(SUBS[diff]);
+  let expr,deriv,hint,question='Resuelve e indica el intervalo:';
+
+  if(sub==='Desigualdad lineal'){
+    const a=rNZ(diff==='easy'?1:-4,diff==='easy'?4:4);
+    const b=rInt(diff==='easy'?-5:-8,diff==='easy'?5:8);
+    const c=rInt(diff==='easy'?-5:-8,diff==='easy'?5:8);
+    const ops=['<','>','\\leq','\\geq'];
+    const op=rPick(diff==='easy'?['<','>']:ops);
+    const sol=(c-b)/a;const flip=a<0;
+    const finalOp=flip?(op==='<'?'>':op==='>'?'<':op==='\\leq'?'\\geq':'\\leq'):op;
+    expr=`${a}x${b>=0?'+':''}${b}${op}${c}`;
+    deriv=`x${finalOp}${Number.isInteger(sol)?sol:sol.toFixed(2)}`;
+    const intv=finalOp==='<'||finalOp==='\\leq'?`(-\\infty,${Number.isInteger(sol)?sol:sol.toFixed(2)}${finalOp==='<'?')':']'}`:`${finalOp==='>'?'(':  '['}${Number.isInteger(sol)?sol:sol.toFixed(2)},+\\infty)`;
+    deriv+=`,\\quad ${intv}`;
+    hint=`${flip?'⚠ Invierte el signo al dividir por negativo.':'Igual que una ecuación, cuida el signo.'}`;
+  } else if(sub==='Intervalo numérico'){
+    const a=rInt(-5,0),b=rInt(1,5);
+    const type=rPick(['abierto','cerrado','semiabierto']);
+    question='Representa en recta numérica y escribe la desigualdad:';
+    if(type==='abierto'){expr=`(${a},\\,${b})`;deriv=`${a}<x<${b}`;hint='Intervalo abierto: excluye extremos.'}
+    else if(type==='cerrado'){expr=`[${a},\\,${b}]`;deriv=`${a}\\leq x\\leq${b}`;hint='Intervalo cerrado: incluye extremos.'}
+    else{expr=`[${a},\\,${b})`;deriv=`${a}\\leq x<${b}`;hint='Semiabierto: un extremo incluido, otro no.'}
+  } else if(sub==='Inecuación cuadrática'){
+    const r1=rInt(-4,-1),r2=rInt(1,4);
+    const op=rPick(['<','>','\\leq','\\geq']);
+    question='Resuelve la inecuación cuadrática:';
+    expr=`(x${r1>=0?'-':'+'}${Math.abs(r1)})(x-${r2})${op}0`;
+    const lt=op==='<'||op==='\\leq';
+    const bracket1=op==='\\leq'?'[':'(';const bracket2=op==='\\leq'?']':')';
+    deriv=lt?`x\\in${bracket1}${r1},\\,${r2}${bracket2}`:`x\\in(-\\infty,${r1}${bracket1.replace('[',')')}\\cup${bracket2.replace(']','(')}${r2},+\\infty)`;
+    hint=`Raíces: $x=${r1}$ y $x=${r2}$. Analiza el signo en cada intervalo.`;
+  } else if(sub==='Sistema de desigualdades'){
+    const a1=rNZ(1,3),b1=rInt(-4,4),c1=rInt(-4,4);
+    const a2=rNZ(1,3),b2=rInt(-4,4),c2=rInt(-4,4);
+    const op1=rPick(['<','>']);const op2=rPick(['<','>']);
+    question='Resuelve el sistema:';
+    expr=`\\begin{cases}${a1}x${b1>=0?'+':''}${b1}${op1}${c1}\\\\${a2}x${b2>=0?'+':''}${b2}${op2}${c2}\\end{cases}`;
+    const s1=(c1-b1)/a1,s2=(c2-b2)/a2;
+    deriv=`x${op1==='<'?'<':'>'}${s1.toFixed(2)}\\text{ y }x${op2==='<'?'<':'>'}${s2.toFixed(2)}`;
+    hint='Resuelve cada desigualdad por separado, luego intersecta.';
+  } else {
+    // Inecuación con valor absoluto
+    const a=rNZ(1,4),b=rInt(1,6);
+    const op=rPick(['<','\\leq','>','\\geq']);
+    question='Resuelve:';
+    expr=`|${a}x|${op}${b}`;
+    const c=b/a;
+    if(op==='<'||op==='\\leq'){const br=op==='\\leq'?['[',']']:'(,)'.split(',');deriv=`-${c.toFixed(2)}<x<${c.toFixed(2)}`;hint='$|ax|<b\\Rightarrow -b<ax<b$.';}
+    else{deriv=`x<-${c.toFixed(2)}\\text{ o }x>${c.toFixed(2)}`;hint='$|ax|>b\\Rightarrow ax<-b\\text{ o }ax>b$.';}
+  }
+  return {cat:'ineq',catLabel:'Desigualdades',sub,question,expr,deriv,hint,diff};
+}
+
+// ── 7. PRE-CÁLCULO Y FUNCIONES ────────────────────────────────
+function genPrecal(diff) {
+  const SUBS={
+    easy:['Dominio y rango','Función exponencial','Función logarítmica'],
+    med: ['Dominio y rango','Función inversa','Operaciones con funciones','Transformaciones'],
+    hard:['Función inversa','Operaciones con funciones','Funciones polinomiales','Transformaciones'],
+  };
+  const sub=rPick(SUBS[diff]);
+  let expr,deriv,hint,question='Resuelve:';
+
+  if(sub==='Dominio y rango'){
+    const type=rInt(1,diff==='hard'?4:2);
+    if(type===1){const a=rNZ(1,4),b=rInt(-6,6);question='Dominio de:';expr=`f(x)=\\dfrac{${a}}{x${b>=0?'+':''}${b}}`;deriv=`D_f=\\mathbb{R}\\setminus\\{${-b}\\}`;hint='Denominador ≠ 0.';}
+    else if(type===2){const a=rNZ(1,3),b=rInt(-6,6);question='Dominio de:';expr=`f(x)=\\sqrt{${a}x${b>=0?'+':''}${b}}`;const lim=(-b/a);deriv=`x\\geq${lim}`;hint='Radicando ≥ 0.';}
+    else if(type===3){const a=rNZ(1,3),b=rNZ(1,6);question='Dominio de:';expr=`f(x)=\\ln(${a}x${b>=0?'+':''}${b})`;deriv=`x>${-b/a}`;hint='Argumento del logaritmo > 0.';}
+    else{const a=rNZ(-3,3),b=rInt(-4,4);question='Rango de:';expr=`f(x)=${a}x^2${b>=0?'+':''}${b}`;deriv=a>0?`[${b},+\\infty)`:a<0?`(-\\infty,${b}]`:`\\{${b}\\}`;hint=`Vértice en $y=${b}$.`;}
+  } else if(sub==='Función inversa'){
+    const m=rNZ(-4,4),b=rInt(-5,5);
+    question='Inversa de:';
+    expr=`f(x)=${m===1?'':m}x${b>=0?'+':''}${b}`;
+    deriv=`f^{-1}(x)=\\dfrac{x${b>=0?'-':'+'}${Math.abs(b)}}{${m}}`;
+    hint='Intercambia $x$ e $y$, despeja $y$.';
+  } else if(sub==='Función exponencial'){
+    const base=rPick([2,3,5,10]),c=rInt(-3,3);
+    question='Resuelve:';
+    expr=`${base}^x=${Math.pow(base,c)}`;
+    deriv=`x=${c}`;
+    hint=`$${base}^x=${base}^{${c}}\\Rightarrow x=${c}$.`;
+  } else if(sub==='Función logarítmica'){
+    const base=rPick([2,3,5,10]),v=rPick([1,2,3,4]);
+    question='Evalúa:';
+    expr=`\\log_{${base}}(${Math.pow(base,v)})`;
+    deriv=`${v}`;
+    hint=`$\\log_b(b^n)=n$.`;
+  } else if(sub==='Operaciones con funciones'){
+    const a=rNZ(-3,3),b=rInt(-4,4),c=rNZ(-3,3),d=rInt(-4,4);
+    const op=rPick(['+','-','\\circ']);
+    question=`$(f${op==='\\circ'?'\\circ':op}g)(x)$ con $f(x)=${a}x+${b}$, $g(x)=${c}x+${d}$:`;
+    expr=`f(x)=${a}x${b>=0?'+':''}${b},\\;g(x)=${c}x${d>=0?'+':''}${d}`;
+    if(op==='+')deriv=`${a+c}x+${b+d}`;
+    else if(op==='-')deriv=`${a-c}x+${b-d}`;
+    else deriv=`${a*c}x+${a*d+b}`;
+    hint=op==='\\circ'?'$(f\\circ g)(x)=f(g(x))$.':'Opera componente a componente.';
+  } else if(sub==='Transformaciones'){
+    const h=rInt(-4,4),k=rInt(-4,4),a=rNZ(-3,3);
+    const base=rPick(['x^2','|x|','\\sqrt{x}','\\sin x']);
+    question=`Describe la transformación de $f(x)=${base}$:`;
+    expr=`g(x)=${a===1?'':a===-1?'-':a}f(x${h>=0?'-':'+'}${Math.abs(h)})${k>=0?'+':''}${k}`;
+    deriv=`\\text{Horiz: }${h>=0?'\\to':'\\leftarrow'}${Math.abs(h)},\\;\\text{Vert: }${k>=0?'\\uparrow':'\\downarrow'}${Math.abs(k)}${Math.abs(a)!==1?`,\\;\\text{escala }${Math.abs(a)}`:''}${a<0?',\\;\\text{reflejo}':''}`;
+    hint='$g(x)=af(x-h)+k$: $h$ horizontal, $k$ vertical, $|a|$ escala.';
+  } else {
+    const n=rInt(2,diff==='hard'?5:3);
+    const coeffs=Array.from({length:n+1},()=>rNZ(-4,4));
+    const xv=rInt(-2,2);
+    const val=coeffs.reduce((acc,c,i)=>acc+c*Math.pow(xv,n-i),0);
+    const polyStr=coeffs.map((c,i)=>{const p=n-i;return p===0?`${c>=0&&i>0?'+':''}${c}`:p===1?`${c>=0&&i>0?'+':''}${c===1?'':c===-1?'-':c}x`:`${c>=0&&i>0?'+':''}${c===1?'':c===-1?'-':c}x^{${p}}`;}).join('');
+    question=`Evalúa para $x=${xv}$:`;
+    expr=`f(x)=${polyStr}`;
+    deriv=`f(${xv})=${val}`;
+    hint='Sustituye y opera término a término.';
+  }
+  return {cat:'precal',catLabel:'Pre-Cálculo',sub,question,expr,deriv,hint,diff};
+}
+
+// ── 8. COMPLEJOS Y LÍMITES ────────────────────────────────────
+function genComp(diff) {
+  const SUBS={
+    easy:['Forma binómica','Operaciones con complejos','Límites por sustitución'],
+    med: ['Operaciones con complejos','Módulo y argumento','Límites indeterminados'],
+    hard:['Forma polar','Límites indeterminados','Límites al infinito'],
+  };
+  const sub=rPick(SUBS[diff]);
+  let expr,deriv,hint,question='Resuelve:';
+
+  if(sub==='Forma binómica'){
+    const a=rInt(-5,5),b=rNZ(-5,5);
+    question='Conjugado de:';
+    expr=`z=${a}${b>=0?'+':''}${b}i`;
+    deriv=`\\bar{z}=${a}${b>=0?'-':'+'}${Math.abs(b)}i`;
+    hint='El conjugado invierte el signo imaginario.';
+  } else if(sub==='Operaciones con complejos'){
+    const a=rInt(-4,4),b=rNZ(-4,4),c=rInt(-4,4),d=rNZ(-4,4);
+    const op=rPick(diff==='hard'?['+','-','\\cdot']:['+','-']);
+    question=`Calcula:`;
+    expr=`(${a}${b>=0?'+':''}${b}i)${op}(${c}${d>=0?'+':''}${d}i)`;
+    if(op==='+')deriv=`${a+c}${b+d>=0?'+':''}${b+d}i`;
+    else if(op==='-')deriv=`${a-c}${b-d>=0?'+':''}${b-d}i`;
+    else{const re=a*c-b*d,im=a*d+b*c;deriv=`${re}${im>=0?'+':''}${im}i`;}
+    hint='$i^2=-1$.';
+  } else if(sub==='Módulo y argumento'){
+    const a=rInt(-5,5),b=rNZ(-5,5);
+    const mod=Math.sqrt(a*a+b*b);
+    const arg=(Math.atan2(b,a)*180/Math.PI).toFixed(1);
+    question='Módulo y argumento de:';
+    expr=`z=${a}${b>=0?'+':''}${b}i`;
+    deriv=`|z|=\\sqrt{${a*a+b*b}}\\approx${mod.toFixed(3)},\\;\\arg\\approx${arg}°`;
+    hint='$|z|=\\sqrt{a^2+b^2}$.';
+  } else if(sub==='Forma polar'){
+    const r=rInt(1,6),theta=rPick([0,30,45,60,90,120]);
+    question='Binómica:';
+    expr=`z=${r}(\\cos${theta}°+i\\sin${theta}°)`;
+    const re=(r*Math.cos(theta*Math.PI/180)).toFixed(3),im=(r*Math.sin(theta*Math.PI/180)).toFixed(3);
+    deriv=`z\\approx${re}+${im}i`;
+    hint='$a=r\\cos\\theta$, $b=r\\sin\\theta$.';
+  } else if(sub==='Límites por sustitución'){
+    const a=rNZ(-5,5),b=rInt(-5,5),x0=rInt(-4,4);
+    question='Límite por sustitución directa:';
+    expr=`\\lim_{x\\to${x0}}(${a}x${b>=0?'+':''}${b})`;
+    deriv=`${a*x0+b}`;
+    hint='Si es continua, sustituye directamente.';
+  } else if(sub==='Límites indeterminados'){
+    const a=rNZ(1,5),type=rInt(1,3);
+    if(type===1){expr=`\\lim_{x\\to${a}}\\dfrac{x^2-${a*a}}{x-${a}}`;deriv=`${2*a}`;hint='Factoriza $x^2-a^2=(x-a)(x+a)$.'}
+    else if(type===2){const c=rPick([1,2,3]);expr=`\\lim_{x\\to0}\\dfrac{\\sin(${c}x)}{x}`;deriv=`${c}`;hint='$\\lim_{x\\to0}\\frac{\\sin(ax)}{x}=a$.'}
+    else{const b=rNZ(1,4);expr=`\\lim_{x\\to0}\\dfrac{e^{${b}x}-1}{x}`;deriv=`${b}`;hint='$\\lim_{x\\to0}\\frac{e^{ax}-1}{x}=a$.'}
+    question='Límite indeterminado:';
+  } else {
+    const a=rNZ(1,4),b=rNZ(1,4),c=rNZ(1,4);
+    question='Límite al infinito:';
+    expr=`\\lim_{x\\to\\infty}\\dfrac{${a}x^2+${b}}{${c}x^2+1}`;
+    deriv=`\\dfrac{${a}}{${c}}`;
+    hint='Mismo grado: razón de coeficientes líderes.';
+  }
+  return {cat:'comp',catLabel:'Complejos y Límites',sub,question,expr,deriv,hint,diff};
+}
+
+// ── 9. CÁLCULO DIFERENCIAL (conservado íntegro) ───────────────
+function genDif(diff) {
+  const SUBS_EASY=['Regla de la potencia','Trigonométrica'];
+  const SUBS_MED=['Regla de la potencia','Regla de la cadena','Exponencial','Logarítmica','Trigonométrica'];
+  const SUBS_HARD=['Regla de la cadena','Exponencial','Logarítmica','Orden superior',"L'Hôpital"];
+  const sub=rPick(diff==='easy'?SUBS_EASY:diff==='med'?SUBS_MED:SUBS_HARD);
+  if(sub==='Regla de la potencia')return _genPot(diff);
+  if(sub==='Regla de la cadena')return _genCad(diff);
+  if(sub==='Exponencial')return _genExpD(diff);
+  if(sub==='Logarítmica')return _genLogD(diff);
+  if(sub==='Trigonométrica')return _genTrigD(diff);
+  if(sub==='Orden superior')return _genOrd(diff);
+  return _genHop(diff);
+}
+function _genPot(diff){
+  const a=rNZ(diff==='easy'?1:-4,diff==='easy'?4:6),n=rInt(diff==='easy'?2:2,diff==='easy'?4:7);
+  const expr=`${a===1?'':a}x^{${n}}`,da=a*n,dn=n-1;
+  const deriv=dn===0?`${da}`:dn===1?`${da}x`:`${da}x^{${dn}}`;
+  return {cat:'dif',catLabel:'Cálc. Diferencial',sub:'Regla de la potencia',question:"Encuentra $f'(x)$:",expr,deriv,hint:'$\\frac{d}{dx}[ax^n]=nax^{n-1}$.',diff};
+}
+function _genCad(diff){
+  const pair=rPick(TRIG_LIST);
+  const a=rNZ(diff==='easy'?1:-3,diff==='easy'?3:4),b=rInt(-5,5),n=rInt(2,6);
+  const inner=`${a===1?'':a}x${b>=0?'+':''}${b}`;
+  const expr=`(${inner})^{${n}}`;
+  const deriv=`${n*a}(${inner})^{${n-1}}`;
+  return {cat:'dif',catLabel:'Cálc. Diferencial',sub:'Regla de la cadena',question:"Encuentra $f'(x)$:",expr,deriv,hint:'$[u^n]\'=nu^{n-1}u\'$.',diff};
+}
+function _genExpD(diff){
+  if(diff==='easy'){const a=rNZ(-4,4);return {cat:'dif',catLabel:'Cálc. Diferencial',sub:'Exponencial',question:"Encuentra $f'(x)$:",expr:`${a===1?'':a}e^x`,deriv:`${a===1?'':a}e^x`,hint:'$[e^x]\'=e^x$.',diff};}
+  const a=rNZ(-4,4),b=rInt(-4,4);
+  return {cat:'dif',catLabel:'Cálc. Diferencial',sub:'Exponencial',question:"Encuentra $f'(x)$:",expr:`e^{${a}x${b>=0?'+':''}${b}}`,deriv:`${a}e^{${a}x${b>=0?'+':''}${b}}`,hint:'$[e^u]\'=e^u u\'$.',diff};
+}
+function _genLogD(diff){
+  if(diff==='easy'){const a=rNZ(-4,4);return {cat:'dif',catLabel:'Cálc. Diferencial',sub:'Logarítmica',question:"Encuentra $f'(x)$:",expr:`${a===1?'':a}\\ln x`,deriv:`\\frac{${a}}{x}`,hint:'$[\\ln x]\'=1/x$.',diff};}
+  const a=rNZ(-4,4),b=rNZ(1,6);
+  return {cat:'dif',catLabel:'Cálc. Diferencial',sub:'Logarítmica',question:"Encuentra $f'(x)$:",expr:`\\ln(${a}x+${b})`,deriv:`\\frac{${a}}{${a}x+${b}}`,hint:'$[\\ln u]\'=u\'/u$.',diff};
+}
+function _genTrigD(diff){
+  const pair=rPick(diff==='easy'?TRIG_LIST.slice(0,2):TRIG_LIST);
+  const a=rNZ(-4,4);
+  return {cat:'dif',catLabel:'Cálc. Diferencial',sub:'Trigonométrica',question:"Encuentra $f'(x)$:",expr:`${a===1?'':a}${pair.f}(x)`,deriv:`${a===1?'':a}${pair.df}(x)`,hint:`$[${pair.f}]'=${pair.df}$.`,diff};
+}
+function _genOrd(diff){
+  const a=rNZ(-3,3),n=rInt(3,6);
+  const d1=a*n,e1=n-1,d2=d1*e1,e2=e1-1;
+  const deriv=e2===0?`${d2}`:e2===1?`${d2}x`:`${d2}x^{${e2}}`;
+  return {cat:'dif',catLabel:'Cálc. Diferencial',sub:'Orden superior',question:'Encuentra $f\'\'(x)$:',expr:`${a}x^{${n}}`,deriv,hint:'Deriva dos veces.',diff};
+}
+function _genHop(diff){
+  const a=rNZ(1,5);
+  const type=rInt(1,3);
+  let expr,deriv,hint;
+  if(type===1){expr=`\\lim_{x\\to${a}}\\frac{x^2-${a*a}}{x-${a}}`;deriv=`${2*a}`;hint='Forma $0/0$.';}
+  else if(type===2){const c=rPick([1,2,3]);expr=`\\lim_{x\\to0}\\frac{\\sin(${c}x)}{x}`;deriv=`${c}`;hint='L\'Hôpital una vez.';}
+  else{expr=`\\lim_{x\\to\\infty}\\frac{x^2}{e^x}`;deriv='0';hint='Aplica L\'Hôpital dos veces.';}
+  return {cat:'dif',catLabel:'Cálc. Diferencial',sub:"L'Hôpital",question:'Calcula:',expr,deriv,hint,diff};
+}
+
+// ── 10. CÁLCULO INTEGRAL (ajustado a bachillerato) ────────────
+function genInt(diff) {
+  // SIN sustitución de variable — solo bachillerato
+  const SUBS={
+    easy:['Antiderivada de potencia','Antiderivada constante'],
+    med: ['Antiderivada de potencia','Integral trigonométrica','Integral exponencial'],
+    hard:['Antiderivada de potencia','Integral trigonométrica','Integral exponencial','Integral definida'],
+  };
+  const sub=rPick(SUBS[diff]);
+  let expr,deriv,hint,question='Calcula:';
+
+  if(sub==='Antiderivada constante'){
+    const a=rNZ(-6,6);
+    expr=`\\int ${a}\\,dx`;
+    deriv=`${a}x+C`;
+    hint='$\\int k\\,dx=kx+C$.';
+  } else if(sub==='Antiderivada de potencia'){
+    const a=rNZ(-5,5);
+    const n=rInt(diff==='easy'?1:0,diff==='easy'?3:diff==='med'?4:5);
+    if(n===-1){
+      expr=`\\int\\dfrac{${a}}{x}\\,dx`;
+      deriv=`${a}\\ln|x|+C`;
+      hint='$\\int\\frac{1}{x}dx=\\ln|x|+C$.';
+    } else {
+      expr=`\\int ${a===1?'':a}x^{${n}}\\,dx`;
+      const num=a,den=n+1,g=gcd(Math.abs(num),Math.abs(den));
+      const ns=num/g,ds=den/g;
+      deriv=ds===1?`${ns}x^{${n+1}}+C`:`\\dfrac{${ns}}{${ds}}x^{${n+1}}+C`;
+      hint=`$\\int x^n\\,dx=\\frac{x^{n+1}}{n+1}+C$, $n\\neq-1$.`;
+    }
+  } else if(sub==='Integral trigonométrica'){
+    const intTrig=[
+      {f:'\\sin x',F:'-\\cos x',h:'$\\int\\sin x\\,dx=-\\cos x+C$'},
+      {f:'\\cos x',F:'\\sin x',h:'$\\int\\cos x\\,dx=\\sin x+C$'},
+      {f:'\\sec^2 x',F:'\\tan x',h:'$\\int\\sec^2 x\\,dx=\\tan x+C$'},
+      {f:'\\csc^2 x',F:'-\\cot x',h:'$\\int\\csc^2 x\\,dx=-\\cot x+C$'},
+    ];
+    const t=rPick(diff==='easy'?intTrig.slice(0,2):intTrig);
+    const a=rNZ(-4,4);
+    expr=`\\int ${a===1?'':a}${t.f}\\,dx`;
+    deriv=`${a===1?'':a}${t.F}+C`;
+    hint=t.h;
+  } else if(sub==='Integral exponencial'){
+    const a=rNZ(-4,4);
+    expr=`\\int ${a===1?'':a}e^x\\,dx`;
+    deriv=`${a===1?'':a}e^x+C`;
+    hint='$\\int e^x\\,dx=e^x+C$.';
+  } else {
+    // Integral definida — solo hard, números sencillos
+    const n=rInt(1,3),lo=rPick([0,1]),hi=rPick([2,3,4]);
+    const a=rNZ(1,3);
+    expr=`\\int_{${lo}}^{${hi}}${a===1?'':a}x^{${n}}\\,dx`;
+    const F=(x)=>a*Math.pow(x,n+1)/(n+1);
+    const val=F(hi)-F(lo);
+    deriv=`\\left[\\dfrac{${a}x^{${n+1}}}{${n+1}}\\right]_{${lo}}^{${hi}}=${val.toFixed(2)}`;
+    hint='Teorema Fundamental: $F(b)-F(a)$.';
+  }
+  return {cat:'int',catLabel:'Cálc. Integral',sub,question,expr,deriv,hint,diff};
+}
+
+// ── 11. PROBABILIDAD (nueva categoría) ───────────────────────
+function genProb(diff) {
+  const SUBS={
+    easy:['Probabilidad clásica','Complemento'],
+    med: ['Probabilidad clásica','Complemento','Probabilidad de unión','Permutaciones'],
+    hard:['Probabilidad condicional','Combinaciones','Permutaciones','Probabilidad de unión'],
+  };
+  const sub=rPick(SUBS[diff]);
+  let expr,deriv,hint,question='Resuelve:';
+
+  if(sub==='Probabilidad clásica'){
+    const total=rPick(diff==='easy'?[6,10,20]:[6,10,20,52,100]);
+    const fav=rInt(1,Math.floor(total/2));
+    question='Probabilidad de sacar el evento favorable:';
+    expr=`\\text{Casos favorables: }${fav},\\quad\\text{Total: }${total}`;
+    const g=gcd(fav,total);
+    deriv=`P=\\dfrac{${fav}}{${total}}${g>1?`=\\dfrac{${fav/g}}{${total/g}}`:''}\\approx${(fav/total*100).toFixed(1)}\\%`;
+    hint='$P(A)=\\frac{\\text{casos favorables}}{\\text{casos totales}}$.';
+  } else if(sub==='Complemento'){
+    const total=rPick([4,5,6,8,10,20]);
+    const fav=rInt(1,total-1);
+    const g=gcd(fav,total),gc=gcd(total-fav,total);
+    question='Calcula $P(A)$ y $P(A^c)$:';
+    expr=`P(A)=\\dfrac{${fav}}{${total}}`;
+    deriv=`P(A^c)=1-\\dfrac{${fav}}{${total}}=\\dfrac{${total-fav}}{${total}}${gc>1?`=\\dfrac{${(total-fav)/gc}}{${total/gc}}`:''}`;
+    hint='$P(A^c)=1-P(A)$.';
+  } else if(sub==='Probabilidad de unión'){
+    const a=rInt(1,5),b=rInt(1,5),ab=rInt(0,Math.min(a,b));
+    const total=rPick([10,20,52]);
+    question='Probabilidad de unión $P(A\\cup B)$:';
+    expr=`P(A)=\\dfrac{${a}}{${total}},\\;P(B)=\\dfrac{${b}}{${total}},\\;P(A\\cap B)=\\dfrac{${ab}}{${total}}`;
+    const num=a+b-ab;const g=gcd(num,total);
+    deriv=`P(A\\cup B)=\\dfrac{${a}+${b}-${ab}}{${total}}=\\dfrac{${num}}{${total}}${g>1?`=\\dfrac{${num/g}}{${total/g}}`:''}`;
+    hint='$P(A\\cup B)=P(A)+P(B)-P(A\\cap B)$.';
+  } else if(sub==='Probabilidad condicional'){
+    const pab=rInt(1,4),pb=rInt(pab,8);
+    question='Probabilidad condicional:';
+    expr=`P(A\\cap B)=\\dfrac{${pab}}{20},\\;P(B)=\\dfrac{${pb}}{20}`;
+    deriv=`P(A|B)=\\dfrac{P(A\\cap B)}{P(B)}=\\dfrac{${pab}}{${pb}}${gcd(pab,pb)>1?`=\\dfrac{${pab/gcd(pab,pb)}}{${pb/gcd(pab,pb)}}`:''}`;
+    hint='$P(A|B)=\\frac{P(A\\cap B)}{P(B)}$.';
+  } else if(sub==='Permutaciones'){
+    const n=rInt(4,diff==='hard'?8:6),r=rInt(2,n-1);
+    const fact=(k)=>k<=1?1:k*fact(k-1);
+    const val=fact(n)/fact(n-r);
+    question=`¿De cuántas formas se pueden ordenar $r=${r}$ de $n=${n}$ objetos?`;
+    expr=`P(${n},${r})=\\dfrac{${n}!}{(${n}-${r})!}`;
+    deriv=`\\dfrac{${n}!}{${n-r}!}=${val}`;
+    hint='$P(n,r)=\\frac{n!}{(n-r)!}$.';
+  } else {
+    const n=rInt(4,diff==='hard'?8:6),r=rInt(2,n-1);
+    const fact=(k)=>k<=1?1:k*fact(k-1);
+    const val=fact(n)/(fact(r)*fact(n-r));
+    question=`¿Cuántos grupos de $r=${r}$ se pueden formar de $n=${n}$ objetos?`;
+    expr=`\\binom{${n}}{${r}}=\\dfrac{${n}!}{${r}!(${n}-${r})!}`;
+    deriv=`\\dfrac{${n}!}{${r}!\\cdot${n-r}!}=${val}`;
+    hint='$\\binom{n}{r}=\\frac{n!}{r!(n-r)!}$.';
+  }
+  return {cat:'prob',catLabel:'Probabilidad',sub,question,expr,deriv,hint,diff};
+}
+
+// ══════════════════════════════════════════════════════════════
+//  REGISTRY
+// ══════════════════════════════════════════════════════════════
+const GENERATORS={arit:genArit,alg1:genAlg1,alg2:genAlg2,geo:genGeo,trig:genTrig,ineq:genIneq,precal:genPrecal,comp:genComp,dif:genDif,int:genInt,prob:genProb};
+
+const CAT_CONFIG={
+  arit: {label:'Aritmética',           color:'#b45309'},
+  alg1: {label:'Álgebra I',            color:'#1d4ed8'},
+  alg2: {label:'Álgebra y Func.',      color:'#7c3aed'},
+  geo:  {label:'Geometría',            color:'#0f766e'},
+  trig: {label:'Trig. y Analítica',    color:'#0e7490'},
+  ineq: {label:'Desigualdades',        color:'#0f4c75'},
+  precal:{label:'Pre-Cálculo',         color:'#92400e'},
+  comp: {label:'Complejos y Límites',  color:'#1a5276'},
+  dif:  {label:'Cálc. Diferencial',    color:'#c01a1a'},
+  int:  {label:'Cálc. Integral',       color:'#166534'},
+  prob: {label:'Probabilidad',         color:'#6b21a8'},
+};
+
+const DIFF_LABELS={easy:'Básica',med:'Intermedia',hard:'Avanzada'};
+const DIFF_CLASSES={easy:'diff-easy',med:'diff-med',hard:'diff-hard'};
+
+// ══════════════════════════════════════════════════════════════
+//  RENDER
+// ══════════════════════════════════════════════════════════════
+let solCount=0;
+function buildCard(ex,idx){
+  const cfg=CAT_CONFIG[ex.cat];
+  const card=document.createElement('div');
+  card.className=`ex-card bc-${ex.cat}`;
+  card.style.animationDelay=`${Math.min(idx*40,600)}ms`;
+  const sid=`sol-${++solCount}`;
+  card.innerHTML=`
+    <div class="ex-header">
+      <span class="ex-num">EJ. ${String(idx+1).padStart(2,'0')}</span>
+      <div class="ex-tags">
+        <span class="ex-tag cat" style="background:${cfg.color}">${ex.catLabel}</span>
+        <span class="ex-tag sub">${ex.sub}</span>
+        <span class="ex-tag ${DIFF_CLASSES[ex.diff]}">${DIFF_LABELS[ex.diff]}</span>
+      </div>
+    </div>
+    <div class="ex-question">${ex.question||'Resuelve:'}</div>
+    <div class="ex-formula-wrap">$$${ex.expr}$$</div>
+    <button class="toggle-sol" onclick="toggleSol('${sid}',this)">Ver solución</button>
+    <div class="solution" id="${sid}">
+      <div class="sol-label">✓ Solución</div>
+      <div>$$${ex.deriv}$$</div>
+      ${ex.hint?`<div class="sol-hint">💡 ${ex.hint}</div>`:''}
+    </div>`;
+  return card;
+}
+
+function toggleSol(id,btn){
+  const el=document.getElementById(id);
+  el.classList.toggle('visible');
+  btn.textContent=el.classList.contains('visible')?'Ocultar solución':'Ver solución';
+  if(el.classList.contains('visible')&&window.MathJax)MathJax.typesetPromise([el]);
+}
+
+// ── Dificultad activa ──
+let currentDiff='all';
+document.querySelectorAll('.diff-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.diff-btn').forEach(b=>{
+      b.className='diff-btn';// quita active
+    });
+    const d=btn.dataset.diff;
+    currentDiff=d;
+    btn.classList.add(`active-${d}`);
+  });
+});
+
+function generate(){
+  const activeCats=[...document.querySelectorAll('.cat-btn.active')].map(b=>b.dataset.cat);
+  if(!activeCats.length){alert('Selecciona al menos una categoría.');return;}
+  const count=parseInt(document.getElementById('countSel').value);
+  const list=document.getElementById('exList');
+  list.innerHTML='';
+
+  // Determina qué niveles generar
+  const diffPool=currentDiff==='all'?['easy','med','hard']:[currentDiff];
+
+  const exs=[];
+  let attempts=0;
+  while(exs.length<count&&attempts<count*5){
+    attempts++;
+    const cat=rPick(activeCats);
+    const diff=rPick(diffPool);
+    try{exs.push(GENERATORS[cat](diff));}
+    catch(e){console.warn('genErr',cat,diff,e);}
+  }
+
+  if(!exs.length){
+    list.innerHTML=`<div class="no-results"><span class="big">∅</span><p>No se pudieron generar ejercicios con los filtros actuales.</p></div>`;
+    return;
+  }
+
+  exs.forEach((ex,i)=>list.appendChild(buildCard(ex,i)));
+
+  const lbl=document.getElementById('sessionLabel');
+  const now=new Date();
+  const diffTxt=currentDiff==='all'?'todos los niveles':DIFF_LABELS[currentDiff];
+  lbl.style.display='block';
+  lbl.textContent=`${exs.length} ejercicio${exs.length>1?'s':''} · ${diffTxt} · ${activeCats.length} categoría${activeCats.length>1?'s':''} · ${now.toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
+
+  if(window.MathJax)MathJax.typesetPromise([list]);
+  document.querySelector('main').scrollIntoView({behavior:'smooth'});
+}
+
+// ── Categorías toggle ──
+document.querySelectorAll('.cat-btn').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('active')));
+
+let allActive=true;
+document.getElementById('selAllBtn').addEventListener('click',()=>{
+  allActive=!allActive;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',allActive));
+});
+
+document.getElementById('genBtn').addEventListener('click',generate);
+</script>
+</body>
+</html>
